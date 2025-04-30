@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Roblox Application Form</title>
+
+    <style>
+        /* San Francisco font for the page */
+        body {
+            font-family: 'San Francisco', Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-field {
+            width: 80%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background-color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 80%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+
+        .secret-tab {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Roblox Application Form</h1>
+
+        <input type="text" id="username" class="input-field" placeholder="Enter Roblox Username" required />
+        <button class="btn" onclick="submitForm()">Submit Application</button>
+
+        <div id="result" class="result"></div>
+
+        <!-- Secret Tab (only visible for 'admin' username) -->
+        <div id="secretTab" class="secret-tab">
+            <h3>Welcome Admin! This is the secret tab.</h3>
+            <p>Only visible to the 'admin' username.</p>
+        </div>
+    </div>
+
+    <script>
+        // Function to generate a random ID
+        function generateRandomID() {
+            return Math.floor(Math.random() * 1000000);
+        }
+
+        // Handle form submission
+        function submitForm() {
+            const username = document.getElementById("username").value;
+
+            if (username) {
+                const randomID = generateRandomID();
+                document.getElementById("result").innerHTML = `Your Application ID: ${randomID}`;
+                
+                // Fetch Roblox Profile Data
+                fetchRobloxProfile(username);
+
+                // Check if username is 'admin' to show secret tab
+                toggleSecretTab(username);
+            }
+        }
+
+        // Fetch Roblox profile data
+        async function fetchRobloxProfile(username) {
+            try {
+                const response = await fetch(`https://api.roblox.com/users/get-by-username?username=${username}`);
+                const data = await response.json();
+
+                if (data && data.user) {
+                    // Display Roblox User Data
+                    document.getElementById("result").innerHTML += `
+                        <br>Roblox Username: ${data.user.Name}
+                        <br>Display Name: ${data.user.DisplayName}
+                        <br><img class="profile-img" src="https://www.roblox.com/headshot-thumbnail/image?userId=${data.user.Id}&width=420&height=420&format=png" alt="Profile Picture" />
+                    `;
+                } else {
+                    document.getElementById("result").innerHTML += `<br>Could not fetch Roblox profile data.`;
+                }
+            } catch (error) {
+                console.error("Error fetching Roblox profile:", error);
+                document.getElementById("result").innerHTML += `<br>Error fetching profile data.`;
+            }
+        }
+
+        // Toggle the visibility of the secret tab based on the username
+        function toggleSecretTab(username) {
+            if (username === "admin") {
+                document.getElementById("secretTab").style.display = "block";
+            } else {
+                document.getElementById("secretTab").style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>
